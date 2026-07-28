@@ -40,8 +40,6 @@
   --color-success: var(--success);
   --color-warning: var(--warning);
   --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
-  --shadow-card: var(--shadow-card);
-  --shadow-elevated: var(--shadow-elevated);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);

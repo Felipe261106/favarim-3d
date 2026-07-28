@@ -102,7 +102,7 @@ function Produto() {
             />
           </div>
           <ul className="mt-3 flex gap-3">
-            {produto.galeria.map((g, i) => (
+            {produto.galeria.map((g: string, i: number) => (
               <li key={i}>
                 <button
                   type="button"
@@ -230,7 +230,7 @@ function Produto() {
         <section>
           <h2 className="text-xl font-extrabold">Especificações</h2>
           <dl className="mt-3 overflow-hidden rounded-xl border border-border">
-            {produto.especificacoes.map((e, i) => (
+            {produto.especificacoes.map((e: { label: string; valor: string }, i: number) => (
               <div key={e.label} className={`grid grid-cols-2 gap-4 px-4 py-3 text-sm ${i % 2 ? "bg-secondary/60" : ""}`}>
                 <dt className="font-medium">{e.label}</dt>
                 <dd className="text-muted-foreground">{e.valor}</dd>

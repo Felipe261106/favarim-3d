@@ -14,11 +14,11 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ProdutosRouteImport } from './routes/produtos'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ContatoRouteImport } from './routes/contato'
-import { Route as ContaRouteImport } from './routes/conta'
-import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProdutoSlugRouteImport } from './routes/produto.$slug'
+import { Route as AuthenticatedContaRouteImport } from './routes/_authenticated/conta'
+import { Route as AuthenticatedCheckoutRouteImport } from './routes/_authenticated/checkout'
 
 const SobreRoute = SobreRouteImport.update({
   id: '/sobre',
@@ -45,16 +45,6 @@ const ContatoRoute = ContatoRouteImport.update({
   path: '/contato',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ContaRoute = ContaRouteImport.update({
-  id: '/conta',
-  path: '/conta',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CheckoutRoute = CheckoutRouteImport.update({
-  id: '/checkout',
-  path: '/checkout',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CarrinhoRoute = CarrinhoRouteImport.update({
   id: '/carrinho',
   path: '/carrinho',
@@ -70,42 +60,52 @@ const ProdutoSlugRoute = ProdutoSlugRouteImport.update({
   path: '/produto/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedContaRoute = AuthenticatedContaRouteImport.update({
+  id: '/_authenticated/conta',
+  path: '/conta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedCheckoutRoute = AuthenticatedCheckoutRouteImport.update({
+  id: '/_authenticated/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/carrinho': typeof CarrinhoRoute
-  '/checkout': typeof CheckoutRoute
-  '/conta': typeof ContaRoute
   '/contato': typeof ContatoRoute
   '/login': typeof LoginRoute
   '/produtos': typeof ProdutosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sobre': typeof SobreRoute
+  '/checkout': typeof AuthenticatedCheckoutRoute
+  '/conta': typeof AuthenticatedContaRoute
   '/produto/$slug': typeof ProdutoSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/carrinho': typeof CarrinhoRoute
-  '/checkout': typeof CheckoutRoute
-  '/conta': typeof ContaRoute
   '/contato': typeof ContatoRoute
   '/login': typeof LoginRoute
   '/produtos': typeof ProdutosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sobre': typeof SobreRoute
+  '/checkout': typeof AuthenticatedCheckoutRoute
+  '/conta': typeof AuthenticatedContaRoute
   '/produto/$slug': typeof ProdutoSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/carrinho': typeof CarrinhoRoute
-  '/checkout': typeof CheckoutRoute
-  '/conta': typeof ContaRoute
   '/contato': typeof ContatoRoute
   '/login': typeof LoginRoute
   '/produtos': typeof ProdutosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sobre': typeof SobreRoute
+  '/_authenticated/checkout': typeof AuthenticatedCheckoutRoute
+  '/_authenticated/conta': typeof AuthenticatedContaRoute
   '/produto/$slug': typeof ProdutoSlugRoute
 }
 export interface FileRouteTypes {
@@ -113,50 +113,50 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/carrinho'
-    | '/checkout'
-    | '/conta'
     | '/contato'
     | '/login'
     | '/produtos'
     | '/sitemap.xml'
     | '/sobre'
+    | '/checkout'
+    | '/conta'
     | '/produto/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/carrinho'
-    | '/checkout'
-    | '/conta'
     | '/contato'
     | '/login'
     | '/produtos'
     | '/sitemap.xml'
     | '/sobre'
+    | '/checkout'
+    | '/conta'
     | '/produto/$slug'
   id:
     | '__root__'
     | '/'
     | '/carrinho'
-    | '/checkout'
-    | '/conta'
     | '/contato'
     | '/login'
     | '/produtos'
     | '/sitemap.xml'
     | '/sobre'
+    | '/_authenticated/checkout'
+    | '/_authenticated/conta'
     | '/produto/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CarrinhoRoute: typeof CarrinhoRoute
-  CheckoutRoute: typeof CheckoutRoute
-  ContaRoute: typeof ContaRoute
   ContatoRoute: typeof ContatoRoute
   LoginRoute: typeof LoginRoute
   ProdutosRoute: typeof ProdutosRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SobreRoute: typeof SobreRoute
+  AuthenticatedCheckoutRoute: typeof AuthenticatedCheckoutRoute
+  AuthenticatedContaRoute: typeof AuthenticatedContaRoute
   ProdutoSlugRoute: typeof ProdutoSlugRoute
 }
 
@@ -197,20 +197,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContatoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/conta': {
-      id: '/conta'
-      path: '/conta'
-      fullPath: '/conta'
-      preLoaderRoute: typeof ContaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/checkout': {
-      id: '/checkout'
-      path: '/checkout'
-      fullPath: '/checkout'
-      preLoaderRoute: typeof CheckoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/carrinho': {
       id: '/carrinho'
       path: '/carrinho'
@@ -232,19 +218,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProdutoSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/conta': {
+      id: '/_authenticated/conta'
+      path: '/conta'
+      fullPath: '/conta'
+      preLoaderRoute: typeof AuthenticatedContaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/checkout': {
+      id: '/_authenticated/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof AuthenticatedCheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CarrinhoRoute: CarrinhoRoute,
-  CheckoutRoute: CheckoutRoute,
-  ContaRoute: ContaRoute,
   ContatoRoute: ContatoRoute,
   LoginRoute: LoginRoute,
   ProdutosRoute: ProdutosRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SobreRoute: SobreRoute,
+  AuthenticatedCheckoutRoute: AuthenticatedCheckoutRoute,
+  AuthenticatedContaRoute: AuthenticatedContaRoute,
   ProdutoSlugRoute: ProdutoSlugRoute,
 }
 export const routeTree = rootRouteImport

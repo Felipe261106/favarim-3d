@@ -6,7 +6,7 @@ import { ProductCard } from "@/components/site/ProductCard";
 import { PRODUTOS, brl } from "@/lib/catalog";
 import { useLoja } from "@/lib/store";
 
-export const Route = createFileRoute("/conta")({
+export const Route = createFileRoute("/_authenticated/conta")({
   component: Conta,
   head: () => ({
     meta: [

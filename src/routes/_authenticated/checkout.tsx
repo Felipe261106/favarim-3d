@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { brl } from "@/lib/catalog";
 import { itensDetalhados, useLoja } from "@/lib/store";
 
-export const Route = createFileRoute("/checkout")({
+export const Route = createFileRoute("/_authenticated/checkout")({
   component: Checkout,
   head: () => ({
     meta: [

@@ -1,9 +1,18 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Heart, Menu, Moon, Search, ShoppingCart, Sun, User, X } from "lucide-react";
+import { Heart, LogOut, Menu, Moon, Search, ShoppingCart, Sun, User, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PRODUTOS } from "@/lib/catalog";
 import { useLoja } from "@/lib/store";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
@@ -23,6 +32,7 @@ export function Navbar() {
   const navigate = useNavigate();
   const boxRef = useRef<HTMLDivElement>(null);
   const { totalItens, favoritos, tema, alternarTema } = useLoja();
+  const { user, nome, foto, sair } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -112,11 +122,41 @@ export function Navbar() {
               <Heart />
             </Link>
           </Button>
-          <Button variant="ghost" size="icon" asChild aria-label="Entrar na conta">
-            <Link to="/login">
-              <User />
-            </Link>
-          </Button>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className="flex items-center gap-2 rounded-full border border-border py-1 pl-1 pr-3 text-sm font-medium transition-colors hover:bg-accent"
+                  aria-label={`Conta de ${nome}`}
+                >
+                  {foto ? (
+                    <img src={foto} alt="" width={28} height={28} className="size-7 rounded-full object-cover" />
+                  ) : (
+                    <span className="grid size-7 place-items-center rounded-full gradient-primary text-xs font-bold text-primary-foreground">
+                      {nome.charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                  <span className="hidden max-w-28 truncate sm:block">{nome}</span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel className="truncate">{nome}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/conta">Minha conta</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => void sair()}>
+                  <LogOut className="mr-2 size-4" /> Sair
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button variant="ghost" size="icon" asChild aria-label="Entrar na conta">
+              <Link to="/login">
+                <User />
+              </Link>
+            </Button>
+          )}
           <Button variant="ghost" size="icon" asChild aria-label={`Carrinho com ${totalItens} itens`}>
             <Link to="/carrinho" className="relative">
               <ShoppingCart />

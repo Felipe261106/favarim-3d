@@ -1,7 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { lovable } from "@/integrations/lovable/index";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/login")({
   component: Login,
@@ -19,16 +22,50 @@ export const Route = createFileRoute("/login")({
 
 function Login() {
   const [modo, setModo] = useState<"entrar" | "cadastrar">("entrar");
+  const [carregandoGoogle, setCarregandoGoogle] = useState(false);
+  const { user, carregando } = useAuth();
+  const navigate = useNavigate();
 
-  const enviar = (e: React.FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    if (!carregando && user) navigate({ to: "/conta", replace: true });
+  }, [user, carregando, navigate]);
+
+  const entrarComGoogle = async () => {
+    setCarregandoGoogle(true);
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin,
+    });
+    if (result.error) {
+      setCarregandoGoogle(false);
+      toast.error("Não foi possível entrar com o Google");
+      return;
+    }
+    if (result.redirected) return;
+    navigate({ to: "/conta", replace: true });
+  };
+
+  const enviar = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const dados = new FormData(e.currentTarget);
     const email = String(dados.get("email") ?? "").trim();
     const senha = String(dados.get("senha") ?? "");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return toast.error("E-mail inválido");
     if (senha.length < 6) return toast.error("A senha precisa ter ao menos 6 caracteres");
-    localStorage.setItem("f3d:usuario", JSON.stringify({ email }));
-    toast.success(modo === "entrar" ? "Bem-vindo de volta!" : "Conta criada com sucesso!");
+    if (modo === "entrar") {
+      const { error } = await supabase.auth.signInWithPassword({ email, password: senha });
+      if (error) return toast.error("E-mail ou senha incorretos");
+      toast.success("Bem-vindo de volta!");
+      navigate({ to: "/conta", replace: true });
+      return;
+    }
+    const nome = String(dados.get("nome") ?? "").trim();
+    const { error } = await supabase.auth.signUp({
+      email,
+      password: senha,
+      options: { emailRedirectTo: window.location.origin, data: { full_name: nome } },
+    });
+    if (error) return toast.error(error.message);
+    toast.success("Conta criada! Verifique seu e-mail para confirmar.");
   };
 
   return (
@@ -45,9 +82,10 @@ function Login() {
           variant="outline"
           size="xl"
           className="mt-6 w-full"
-          onClick={() => toast("Login com Google", { description: "Pronto para integração com Google/Firebase." })}
+          disabled={carregandoGoogle}
+          onClick={entrarComGoogle}
         >
-          Continuar com Google
+          {carregandoGoogle ? "Conectando..." : "Entrar com Google"}
         </Button>
 
         <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
@@ -85,7 +123,15 @@ function Login() {
           <button
             type="button"
             className="text-muted-foreground hover:text-primary"
-            onClick={() => toast("Enviamos as instruções para o seu e-mail")}
+            onClick={async () => {
+              const email = window.prompt("Informe seu e-mail para recuperar a senha") ?? "";
+              if (!email.trim()) return;
+              const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+                redirectTo: `${window.location.origin}/reset-password`,
+              });
+              if (error) return toast.error(error.message);
+              toast.success("Enviamos as instruções para o seu e-mail");
+            }}
           >
             Recuperar senha
           </button>

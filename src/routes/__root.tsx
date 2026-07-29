@@ -15,6 +15,8 @@ import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { FloatingButtons } from "@/components/site/FloatingButtons";
 import { LojaProvider } from "@/lib/store";
+import { AuthProvider } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -148,10 +150,21 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+
+  useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+      router.invalidate();
+      if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+    });
+    return () => sub.subscription.unsubscribe();
+  }, [router, queryClient]);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <LojaProvider>
+      <AuthProvider>
+        <LojaProvider>
         <div className="flex min-h-dvh flex-col">
           <Navbar />
           <main className="flex-1">
@@ -162,7 +175,8 @@ function RootComponent() {
           <FloatingButtons />
           <Toaster position="bottom-left" />
         </div>
-      </LojaProvider>
+        </LojaProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

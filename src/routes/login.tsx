@@ -2,7 +2,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -22,27 +21,12 @@ export const Route = createFileRoute("/login")({
 
 function Login() {
   const [modo, setModo] = useState<"entrar" | "cadastrar">("entrar");
-  const [carregandoGoogle, setCarregandoGoogle] = useState(false);
   const { user, carregando } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!carregando && user) navigate({ to: "/conta", replace: true });
   }, [user, carregando, navigate]);
-
-  const entrarComGoogle = async () => {
-    setCarregandoGoogle(true);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      setCarregandoGoogle(false);
-      toast.error("Não foi possível entrar com o Google");
-      return;
-    }
-    if (result.redirected) return;
-    navigate({ to: "/conta", replace: true });
-  };
 
   const enviar = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -78,21 +62,7 @@ function Login() {
           {modo === "entrar" ? "Acesse seus pedidos e favoritos." : "Leva menos de um minuto."}
         </p>
 
-        <Button
-          variant="outline"
-          size="xl"
-          className="mt-6 w-full"
-          disabled={carregandoGoogle}
-          onClick={entrarComGoogle}
-        >
-          {carregandoGoogle ? "Conectando..." : "Entrar com Google"}
-        </Button>
-
-        <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
-          <span className="h-px flex-1 bg-border" /> ou <span className="h-px flex-1 bg-border" />
-        </div>
-
-        <form onSubmit={enviar} className="grid gap-4">
+        <form onSubmit={enviar} className="mt-6 grid gap-4">
           {modo === "cadastrar" && (
             <div>
               <label htmlFor="nome" className="text-sm font-medium">Nome completo</label>
